@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="description" contents="Our Streaming Website" />
+    <link rel="stylesheet" href="../static/style.css" />
+    <title>Accueil</title>
+  </head>
+  <script>
+    function searchTable(event) {
+      event.preventDefault(); // empêche la soumission du formulaire de recharger la page
+      // récupérer la valeur de recherche
+      const searchText = document.getElementById("search").value.toLowerCase();
+      // récupérer le tableau et les lignes du tableau
+      const table = document.getElementById("myTable");
+      const rows = table.getElementsByTagName("tr");
+      // parcourir toutes les lignes du tableau et cacher celles qui ne correspondent pas à la recherche
+      for (let row of rows) {
+        const cells = row.getElementsByTagName("td");
+        let found = false;
+        for (let cell of cells) {
+          const text = cell.textContent.toLowerCase();
+          if (text.indexOf(searchText) !== -1) {
+            found = true;
+            break;
+          }
+        }
+        if (found) {
+          row.style.display = ""; // afficher la ligne
+        } else {
+          row.style.display = "none"; // cacher la ligne
+        }
+      }
+    }
+    function downloadText(filename, text) {
+      // Créer un élément <a> pour le téléchargement
+      var element = document.createElement("a");
+      element.setAttribute(
+        "href",
+        "data:text/plain;charset=utf-8," + encodeURIComponent(text)
+      );
+      element.setAttribute("download", filename + ".txt");
+      element.style.display = "none";
+      document.body.appendChild(element);
+
+      // Cliquer sur l'élément pour déclencher le téléchargement
+      element.click();
+
+      // Retirer l'élément après le téléchargement
+      document.body.removeChild(element);
+    }
+  </script>
+  <body>
+    <header>
+      <nav class="page__menu page__custom-settings menu">
+        <ul class="menu__list r-list">
+          <li class="menu__group">
+            <a href="/" class="menu__link r-link text-underlined">Accueil</a>
+          </li>
+          <li class="menu__group">
+            <a href="recherche" class="menu__link r-link text-underlined"
+              >Recherche</a
+            >
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <form method="POST" onsubmit="searchTable(event);" class="search-bar" autocomplete="off">
+      <input
+        type="search"
+        id="search"
+        name="search"
+        pattern=".*\S.*"
+        required
+      />
+      <button class="search-btn" type="submit">
+        <span>Search</span>
+      </button>
+    </form>
+
+    <div style="overflow-x: auto">
+      <table class="table-style" id="myTable">
+        <tr>
+          <th>Nom du gene de resistance</th>
+          <th>Taxonomie NCBI</th>
+          <th>Pourcentage d'identite</th>
+          <th>Description du gene</th>
+          <th>Sequence du gene de resistance</th>
+        </tr>
+        {% for item in result %}
+        <tr>
+          <td>{{ item[0] }}</td>
+          <td>{{ item[1] }}</td>
+
+          {% if item[2] > 80 %}
+          <td class="green-background">{{ '%.2f' % item[2] }}%</td>
+          {% elif item[2] < 40 %}
+          <td class="red-background">{{ '%.2f' % item[2] }}%</td>
+          {% else %}
+          <td>{{ '%.2f' % item[2] }}%</td>
+          {% endif %}
+
+          <td>{{ item[3] }}</td>
+          <td>
+            <a href="#" onclick="downloadText('{{ item[0] }}', '{{ item[4] }}')"
+              >Télécharger</a
+            >
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+  </body>
+</html>
