@@ -16,6 +16,7 @@
       const rows = table.getElementsByTagName("tr");
       // parcourir toutes les lignes du tableau et cacher celles qui ne correspondent pas à la recherche
       for (let row of rows) {
+        if(row === rows[0]) continue; // sauter la première ligne (en-tête du tableau)
         const cells = row.getElementsByTagName("td");
         let found = false;
         for (let cell of cells) {
